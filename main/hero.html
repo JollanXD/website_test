@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="color-scheme" content="dark" />
+<meta name="theme-color" content="#030303" />
+<title>VOID — Portfolio</title>
+<script>document.documentElement.classList.replace('no-js','js');</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nosifer&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root{
+  --black:       #030303;
+  --black-2:     #0a0a0a;
+  --bone:        #ece8df;
+  --bone-dim:    #c9c5ba;
+  --gray:        #8a8a8a;
+  --gray-dim:    #2b2b2b;
+  --blood:       #ff1638;
+  --blood-glow:  rgba(255,22,56,.55);
+
+  --font-display: 'Nosifer', 'Butcherman', serif;
+  --font-head:    'Space Grotesk', sans-serif;
+  --font-mono:    'JetBrains Mono', monospace;
+
+  --edge: clamp(18px, 3.2vw, 56px);
+}
+
+/* ============================================================
+   RESET
+   ============================================================ */
+*,*::before,*::after{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{
+  margin:0;
+  background:var(--black);
+  color:var(--bone);
+  font-family:var(--font-head);
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+h1,p{ margin:0; }
+svg{ display:block; }
+a{ color:inherit; }
+
+/* custom cursor only where supported */
+.fine-pointer{ cursor:none; }
+.fine-pointer a,
+.fine-pointer .interactive{ cursor:none; }
+
+:focus-visible{
+  outline:2px solid var(--blood);
+  outline-offset:6px;
+}
+
+/* elements JS will fade in — stay visible if JS never runs */
+.js .fade-init{ opacity:0; }
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{
+  position:relative;
+  width:100%;
+  height:100svh;
+  min-height:560px;
+  overflow:hidden;
+  background:
+    radial-gradient(ellipse 60% 45% at 50% 62%, rgba(255,22,56,.06), transparent 65%),
+    radial-gradient(ellipse 80% 60% at 50% 40%, #0c0c0c, var(--black) 70%);
+}
+
+.threads-canvas{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  opacity:.5;
+  pointer-events:none;
+}
+
+/* decorative torn diamonds */
+.diamond{
+  position:absolute;
+  pointer-events:none;
+  opacity:.35;
+}
+.diamond--a{ width:min(38vw,420px); bottom:-8%; left:-6%; }
+.diamond--b{ width:min(16vw,180px); top:8%; right:6%; }
+.diamond svg{ width:100%; height:100%; overflow:visible; }
+.diamond path{ fill:none; stroke:var(--gray-dim); stroke-width:1; }
+
+/* connective web/crack lines */
+.web-lines{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  z-index:2;
+  pointer-events:none;
+}
+.web-lines path{
+  fill:none;
+  stroke:var(--gray-dim);
+  stroke-width:.8;
+  opacity:.7;
+}
+
+/* ---------- rings ("eye" motif) ---------- */
+.ring{
+  position:absolute;
+  top:50%;
+  width:clamp(150px,17vw,280px);
+  aspect-ratio:1/1;
+  transform:translateY(-50%);
+  z-index:3;
+}
+.ring--left{ left:var(--edge); }
+.ring--right{ right:var(--edge); }
+.ring-svg{ width:100%; height:100%; overflow:visible; }
+.ring-outer{ fill:none; stroke:var(--gray-dim); stroke-width:1; }
+.ring-mid{ fill:none; stroke:var(--bone-dim); stroke-width:5; opacity:.4; }
+.ring-mid-dash{ fill:none; stroke:var(--gray); stroke-width:1; stroke-dasharray:1 7; opacity:.5; }
+.ring-crack{ stroke:var(--gray); stroke-width:1; fill:none; opacity:.35; }
+.ring-label{
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-mono);
+  font-size:clamp(11px,1vw,13px);
+  letter-spacing:.08em;
+  color:var(--bone-dim);
+}
+
+/* ---------- corner labels ---------- */
+.corner{
+  position:absolute;
+  display:flex; flex-direction:column;
+  gap:6px;
+  z-index:4;
+  font-family:var(--font-mono);
+}
+.corner--tl{ top:var(--edge); left:var(--edge); align-items:flex-start; }
+.corner--tr{ top:var(--edge); right:var(--edge); align-items:flex-end; text-align:right; }
+.corner--bl{ bottom:var(--edge); left:var(--edge); align-items:flex-start; }
+.corner--br{ bottom:var(--edge); right:var(--edge); align-items:flex-end; }
+
+.eyebrow{
+  font-family:var(--font-head);
+  font-size:clamp(10px,.95vw,12px);
+  font-weight:500;
+  letter-spacing:.3em;
+  text-transform:uppercase;
+  color:var(--gray);
+}
+.mono-label{
+  font-size:clamp(10px,.85vw,11px);
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--gray);
+}
+.flicker-text{ color:var(--bone-dim); }
+
+/* ---------- scroll cue ---------- */
+.scroll-cue-link{
+  display:flex; flex-direction:column; align-items:flex-end; gap:10px;
+  text-decoration:none;
+}
+.scroll-dots{ display:flex; gap:6px; }
+.scroll-dots .dot{
+  width:6px; height:6px; border-radius:50%;
+  border:1px solid var(--gray);
+  background:transparent;
+}
+.scroll-dots .dot--active{
+  background:var(--blood);
+  border-color:var(--blood);
+  box-shadow:0 0 8px var(--blood-glow);
+}
+
+/* ---------- wordmark ---------- */
+.wordmark-wrap{
+  position:absolute;
+  top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  z-index:5;
+  text-align:center;
+  width:min(92vw,1100px);
+}
+.wordmark{
+  position:relative;
+  display:inline-block;
+  font-family:var(--font-display);
+  font-weight:400;
+  font-size:clamp(3.6rem, 14vw, 10.5rem);
+  line-height:1;
+  letter-spacing:.01em;
+  text-transform:uppercase;
+  color:var(--bone);
+  filter:drop-shadow(0 0 50px rgba(0,0,0,.9));
+  user-select:none;
+}
+.wordmark .layer{ display:block; white-space:nowrap; }
+.wordmark .layer--red,
+.wordmark .layer--ghost{
+  position:absolute; inset:0;
+  opacity:0;
+}
+.wordmark .layer--red{
+  color:var(--blood);
+  mix-blend-mode:screen;
+  clip-path:inset(0 0 0 0);
+}
+.wordmark .layer--ghost{
+  color:var(--bone);
+  filter:blur(3px);
+}
+
+.tagline{
+  margin-top:clamp(18px,3vw,34px);
+  font-family:var(--font-mono);
+  font-size:clamp(10px,1.05vw,13px);
+  letter-spacing:.4em;
+  text-transform:uppercase;
+  color:var(--gray);
+}
+
+/* ---------- red pulse / signal ---------- */
+.pulse{
+  position:absolute;
+  left:50%; bottom:14%;
+  transform:translateX(-50%);
+  z-index:4;
+  display:flex; flex-direction:column; align-items:center;
+  gap:10px;
+  pointer-events:none;
+}
+.pulse-bars{
+  display:flex; align-items:flex-end; gap:3px;
+  height:34px;
+}
+.pulse-bars span{
+  display:block;
+  width:2px; height:6px;
+  background:var(--blood);
+  box-shadow:0 0 8px var(--blood-glow);
+}
+.pulse-core{
+  width:6px; height:6px;
+  border-radius:50%;
+  background:var(--blood);
+  box-shadow:0 0 18px 4px var(--blood-glow);
+}
+
+/* ---------- noise / scan overlays ---------- */
+.noise-overlay{
+  position:fixed; inset:0;
+  z-index:80;
+  pointer-events:none;
+  opacity:.035;
+  mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  animation:noiseShift .8s steps(2) infinite;
+}
+@keyframes noiseShift{
+  0%{ transform:translate(0,0); }
+  50%{ transform:translate(-2%,1%); }
+  100%{ transform:translate(1%,-2%); }
+}
+.scan-flicker{
+  position:absolute; inset:0;
+  z-index:60;
+  background:var(--bone);
+  opacity:0;
+  mix-blend-mode:difference;
+  pointer-events:none;
+}
+
+/* ============================================================
+   CUSTOM CURSOR
+   ============================================================ */
+.cursor-dot,.cursor-ring{
+  position:fixed; top:0; left:0;
+  border-radius:50%;
+  pointer-events:none;
+  z-index:999;
+  mix-blend-mode:difference;
+  will-change:transform;
+}
+.cursor-dot{
+  width:6px; height:6px;
+  margin:-3px 0 0 -3px;
+  background:var(--bone);
+}
+.cursor-ring{
+  width:38px; height:38px;
+  margin:-19px 0 0 -19px;
+  border:1px solid var(--bone);
+  z-index:998;
+}
+.cursor-frag{
+  position:fixed; top:0; left:0;
+  height:1px;
+  pointer-events:none;
+  z-index:997;
+  mix-blend-mode:difference;
+  transform-origin:center;
+}
+
+/* touch / coarse pointer: no custom cursor */
+@media (pointer:coarse){
+  .cursor-dot,.cursor-ring{ display:none; }
+}
+
+/* ============================================================
+   NEXT-SECTION STUB — demonstrates scroll parallax exit only
+   ============================================================ */
+.next-stub{
+  position:relative;
+  min-height:60vh;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--black);
+  border-top:1px solid var(--gray-dim);
+}
+.next-stub .mono-label{ font-size:clamp(11px,1.2vw,13px); letter-spacing:.3em; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:760px){
+  .ring{ width:clamp(90px,32vw,140px); opacity:.6; }
+  .ring--left{ left:calc(var(--edge) * -0.4); }
+  .ring--right{ right:calc(var(--edge) * -0.4); }
+  .diamond--a{ width:60vw; }
+  .pulse{ bottom:10%; }
+  .corner{ gap:4px; }
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+@media (prefers-reduced-motion:reduce){
+  html{ scroll-behavior:auto; }
+  .js .fade-init{ opacity:1; }
+  .noise-overlay{ animation:none; opacity:.02; }
+}
+</style>
+</head>
+<body>
+
+<div class="noise-overlay" aria-hidden="true"></div>
+<div class="cursor-dot" aria-hidden="true"></div>
+<div class="cursor-ring" aria-hidden="true"></div>
+
+<section class="hero" id="hero">
+
+  <canvas class="threads-canvas fade-init" id="threadsCanvas" aria-hidden="true"></canvas>
+  <div class="scan-flicker" aria-hidden="true"></div>
+
+  <!-- decorative torn diamonds -->
+  <div class="diamond diamond--a" data-parallax="0.15" aria-hidden="true">
+    <svg viewBox="0 0 200 200"><path d="M100 4 L188 82 L172 196 L22 178 L6 74 Z"/></svg>
+  </div>
+  <div class="diamond diamond--b" data-parallax="0.25" aria-hidden="true">
+    <svg viewBox="0 0 200 200"><path d="M100 10 L182 100 L100 190 L18 100 Z"/></svg>
+  </div>
+
+  <!-- chaotic connective threads -->
+  <svg class="web-lines fade-init" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M-10 210 L110 190 L170 232 L250 196 L330 224 L430 176 L520 214 L610 180 L720 222 L820 188 L1010 208"/>
+    <path d="M-10 360 L90 388 L160 344 L240 380 L340 336 L420 372 L520 330 L610 368 L700 326 L790 364 L1010 340"/>
+    <path d="M180 -10 L204 90 L172 150 L212 240 L188 320 L216 420 L196 520 L212 610"/>
+    <path d="M800 -10 L780 100 L812 160 L784 250 L808 330 L782 430 L806 520 L788 610"/>
+    <path d="M500 40 L500 150"/>
+    <path d="M500 460 L500 560"/>
+  </svg>
+
+  <!-- eye / ring motifs -->
+  <div class="ring ring--left fade-init interactive" data-parallax="0.55" aria-hidden="true">
+    <svg class="ring-svg" viewBox="0 0 200 200">
+      <circle class="ring-outer" cx="100" cy="100" r="92"/>
+      <circle class="ring-mid" cx="100" cy="100" r="66"/>
+      <circle class="ring-mid-dash" cx="100" cy="100" r="70"/>
+      <path class="ring-crack" d="M100 8 L96 40 L104 55 L98 90"/>
+      <path class="ring-crack" d="M192 100 L160 96 L145 104 L110 98"/>
+      <path class="ring-crack" d="M100 192 L104 160 L96 145 L102 110"/>
+      <path class="ring-crack" d="M8 100 L40 104 L55 96 L90 102"/>
+    </svg>
+    <span class="ring-label">01</span>
+  </div>
+
+  <div class="ring ring--right fade-init interactive" data-parallax="0.55" aria-hidden="true">
+    <svg class="ring-svg" viewBox="0 0 200 200">
+      <circle class="ring-outer" cx="100" cy="100" r="92"/>
+      <circle class="ring-mid" cx="100" cy="100" r="66"/>
+      <circle class="ring-mid-dash" cx="100" cy="100" r="70"/>
+      <path class="ring-crack" d="M100 8 L104 40 L96 55 L102 90"/>
+      <path class="ring-crack" d="M8 100 L40 96 L55 104 L90 98"/>
+      <path class="ring-crack" d="M100 192 L96 160 L104 145 L98 110"/>
+      <path class="ring-crack" d="M192 100 L160 104 L145 96 L110 102"/>
+    </svg>
+    <span class="ring-label">02</span>
+  </div>
+
+  <!-- top-left -->
+  <div class="corner corner--tl">
+    <span class="eyebrow fade-init">Portfolio — Vol. 01</span>
+    <span class="mono-label flicker-text fade-init">Signal lost</span>
+  </div>
+
+  <!-- top-right -->
+  <div class="corner corner--tr">
+    <span class="mono-label fade-init">Sys.04</span>
+    <span class="mono-label fade-init">State :: awake</span>
+  </div>
+
+  <!-- center wordmark -->
+  <div class="wordmark-wrap">
+    <h1 class="wordmark" id="wordmark">
+      <span class="layer layer--base fade-init">VOID</span>
+    </h1>
+    <p class="tagline fade-init">Design &amp; Code — Digital Decay</p>
+  </div>
+
+  <!-- red signal / pulse -->
+  <div class="pulse fade-init" aria-hidden="true">
+    <div class="pulse-bars">
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <div class="pulse-core"></div>
+  </div>
+
+  <!-- bottom-left -->
+  <div class="corner corner--bl">
+    <span class="mono-label fade-init">Not archived</span>
+    <span class="mono-label fade-init">Recalibrating…</span>
+  </div>
+
+  <!-- bottom-right -->
+  <div class="corner corner--br">
+    <a class="scroll-cue-link interactive fade-init" href="#work" aria-label="Scroll to selected work">
+      <span class="scroll-dots" aria-hidden="true">
+        <span class="dot"></span><span class="dot"></span><span class="dot dot--active"></span><span class="dot"></span>
+      </span>
+      <span class="mono-label">Scroll</span>
+    </a>
+  </div>
+
+</section>
+
+<!-- placeholder only, to demonstrate the hero's scroll-exit parallax -->
+<section class="next-stub" id="work">
+  <span class="mono-label">Selected work ↓</span>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  /* ------------------------------------------------------------
+     CONFIG — change the brand word in one place
+     ------------------------------------------------------------ */
+  var BRAND_NAME = "VOID";
+
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var isFinePointer = window.matchMedia('(pointer: fine)').matches;
+  if(isFinePointer){ document.body.classList.add('fine-pointer'); }
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  /* ------------------------------------------------------------
+     BRAND TEXT + GLITCH LAYERS
+     base layer holds the real accessible text; red/ghost are
+     decorative clones used purely for the RGB-split glitch look
+     ------------------------------------------------------------ */
+  var wordmarkEl = document.getElementById('wordmark');
+  var baseLayer  = wordmarkEl.querySelector('.layer--base');
+  baseLayer.textContent = BRAND_NAME;
+  document.title = BRAND_NAME + " — Portfolio";
+
+  ['layer--red','layer--ghost'].forEach(function(cls){
+    var clone = baseLayer.cloneNode(true);
+    clone.classList.remove('layer--base','fade-init');
+    clone.classList.add('layer', cls);
+    clone.setAttribute('aria-hidden','true');
+    wordmarkEl.appendChild(clone);
+  });
+  var redLayer   = wordmarkEl.querySelector('.layer--red');
+  var ghostLayer = wordmarkEl.querySelector('.layer--ghost');
+
+  /* ------------------------------------------------------------
+     GLITCH BURST — reusable RGB-split / shatter flicker
+     ------------------------------------------------------------ */
+  function glitchBurst(opts){
+    opts = opts || {};
+    var intensity = opts.intensity || 10;
+    var repeats   = opts.repeats   || 6;
+    var step      = (opts.duration || .5) / repeats;
+    var tl = gsap.timeline();
+    for(var i=0;i<repeats;i++){
+      (function(){
+        var x = gsap.utils.random(-intensity, intensity);
+        var top = gsap.utils.random(0,45);
+        var bottom = gsap.utils.random(0,45);
+        tl.set(redLayer,{
+          opacity:.75, x:x, y:gsap.utils.random(-3,3),
+          clipPath:'inset('+top+'% 0 '+bottom+'% 0)'
+        }, i*step)
+        .set(ghostLayer,{
+          opacity:.45, x:-x*.6
+        }, i*step);
+      })();
+    }
+    tl.to([redLayer,ghostLayer],{opacity:0,x:0,y:0,clipPath:'inset(0 0 0 0)',duration:.18},repeats*step);
+    return tl;
+  }
+
+  /* ------------------------------------------------------------
+     THREADS CANVAS — procedural cracked / web background
+     ------------------------------------------------------------ */
+  var canvas = document.getElementById('threadsCanvas');
+  var ctx = canvas.getContext('2d');
+  var DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+  function seedRandom(seed){
+    return function(){
+      seed = (seed * 9301 + 49297) % 233280;
+      return seed / 233280;
+    };
+  }
+
+  function drawThreads(){
+    var w = canvas.clientWidth, h = canvas.clientHeight;
+    canvas.width = w * DPR; canvas.height = h * DPR;
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    ctx.clearRect(0,0,w,h);
+
+    var rand = seedRandom(42);
+    var origins = [
+      {x:w*0.14, y:h*0.5}, {x:w*0.86, y:h*0.5},
+      {x:w*0.5,  y:h*0.15},{x:w*0.5,  y:h*0.85}
+    ];
+
+    origins.forEach(function(o, oi){
+      var strands = 5;
+      for(var s=0; s<strands; s++){
+        var x = o.x, y = o.y;
+        var angle = rand() * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(x,y);
+        var segments = 6 + Math.floor(rand()*5);
+        for(var i=0;i<segments;i++){
+          angle += (rand()-0.5) * 1.1;
+          var len = 30 + rand()*70;
+          x += Math.cos(angle)*len;
+          y += Math.sin(angle)*len;
+          ctx.lineTo(x,y);
+        }
+        ctx.strokeStyle = 'rgba(140,140,140,'+(0.06 + rand()*0.10)+')';
+        ctx.lineWidth = 0.6;
+        ctx.stroke();
+      }
+    });
+
+    /* fine scratches */
+    for(var i=0;i<26;i++){
+      var sx = rand()*w, sy = rand()*h;
+      var len2 = 12 + rand()*60;
+      var ang2 = rand()*Math.PI*2;
+      ctx.beginPath();
+      ctx.moveTo(sx,sy);
+      ctx.lineTo(sx+Math.cos(ang2)*len2, sy+Math.sin(ang2)*len2);
+      ctx.strokeStyle = 'rgba(200,200,200,'+(0.02+rand()*0.05)+')';
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+    }
+  }
+  drawThreads();
+
+  var resizeTimer;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(drawThreads, 200);
+  });
+
+  /* ------------------------------------------------------------
+     DRAW WEB-LINES SVG (stroke reveal)
+     ------------------------------------------------------------ */
+  function prepWebLines(){
+    var paths = gsap.utils.toArray('.web-lines path');
+    paths.forEach(function(p){
+      var len = p.getTotalLength();
+      p.style.strokeDasharray = len;
+      p.style.strokeDashoffset = len;
+    });
+    return paths;
+  }
+  var webPaths = prepWebLines();
+
+  /* ------------------------------------------------------------
+     ENTRANCE TIMELINE
+     ------------------------------------------------------------ */
+  var introTl = gsap.timeline({ delay:.15 });
+
+  if(reduceMotion){
+    introTl.to('.fade-init', { opacity:1, duration:.6, stagger:.03 });
+  } else {
+    introTl
+      .to('.noise-overlay', { opacity:.09, duration:.06, repeat:3, yoyo:true })
+      .fromTo('.threads-canvas', {opacity:0}, {opacity:.5, duration:1}, '-=0.15')
+      .to(webPaths, { strokeDashoffset:0, duration:1.1, stagger:.07, ease:'power2.inOut' }, '<')
+      .fromTo('.ring', {opacity:0, scale:.8}, {opacity:.85, scale:1, duration:.9, stagger:.15, ease:'power3.out'}, '-=0.6')
+      .fromTo('.corner', {opacity:0, y:-6}, {opacity:1, y:0, duration:.5, stagger:.06}, '-=0.6')
+      .fromTo(baseLayer, {opacity:0, y:10}, {opacity:1, y:0, duration:.35}, '-=0.25')
+      .add(function(){ glitchBurst({ intensity:16, duration:.6, repeats:7 }); }, '<')
+      .fromTo('.tagline', {opacity:0, y:6}, {opacity:1, y:0, duration:.5}, '-=0.15')
+      .fromTo('.pulse', {opacity:0}, {opacity:1, duration:.5}, '-=0.2')
+      .fromTo('.scroll-cue-link', {opacity:0}, {opacity:1, duration:.4}, '-=0.15')
+      .add(startAmbientLoops);
+  }
+
+  /* ------------------------------------------------------------
+     AMBIENT LOOPS
+     ------------------------------------------------------------ */
+  function startAmbientLoops(){
+    if(reduceMotion) return;
+
+    gsap.to('.ring--left',  { rotate:360,  duration:150, repeat:-1, ease:'none' });
+    gsap.to('.ring--right', { rotate:-360, duration:180, repeat:-1, ease:'none' });
+    gsap.to('.diamond--a',  { rotate:'+=360', duration:220, repeat:-1, ease:'none' });
+    gsap.to('.diamond--b',  { rotate:'-=360', duration:260, repeat:-1, ease:'none' });
+
+    document.querySelectorAll('.pulse-bars span').forEach(function(bar, i){
+      function loop(){
+        gsap.to(bar, { height:gsap.utils.random(4,32)+'px', duration:gsap.utils.random(.3,.8), ease:'sine.inOut', onComplete:loop });
+      }
+      gsap.delayedCall(i*0.05, loop);
+    });
+    gsap.to('.pulse-core', { scale:1.7, opacity:.35, duration:1.1, repeat:-1, yoyo:true, ease:'sine.inOut' });
+    gsap.to('.dot--active', { scale:1.5, duration:.9, repeat:-1, yoyo:true, ease:'sine.inOut' });
+
+    scheduleRandomGlitch();
+    scheduleFlickerText();
+  }
+
+  function scheduleRandomGlitch(){
+    gsap.delayedCall(gsap.utils.random(5,11), function(){
+      glitchBurst({ intensity:10, duration:.35, repeats:5 });
+      gsap.fromTo('.scan-flicker', {opacity:0}, {opacity:.05, duration:.05, yoyo:true, repeat:3});
+      scheduleRandomGlitch();
+    });
+  }
+
+  function scheduleFlickerText(){
+    var el = document.querySelector('.flicker-text');
+    gsap.delayedCall(gsap.utils.random(3,7), function(){
+      gsap.timeline()
+        .to(el, {opacity:.15, duration:.05})
+        .to(el, {opacity:1,  duration:.05})
+        .to(el, {opacity:.3, duration:.04})
+        .to(el, {opacity:1,  duration:.05});
+      scheduleFlickerText();
+    });
+  }
+
+  /* ------------------------------------------------------------
+     MOUSE PARALLAX
+     ------------------------------------------------------------ */
+  var parallaxEls = gsap.utils.toArray('[data-parallax]');
+  var qX = parallaxEls.map(function(el){ return gsap.quickTo(el, 'x', {duration:.6, ease:'power3.out'}); });
+  var qY = parallaxEls.map(function(el){ return gsap.quickTo(el, 'y', {duration:.6, ease:'power3.out'}); });
+
+  /* ------------------------------------------------------------
+     CUSTOM CURSOR
+     ------------------------------------------------------------ */
+  var cursorDot  = document.querySelector('.cursor-dot');
+  var cursorRing = document.querySelector('.cursor-ring');
+  var dotX, dotY, ringX, ringY;
+  if(isFinePointer){
+    dotX  = gsap.quickTo(cursorDot,  'x', {duration:.08, ease:'power3'});
+    dotY  = gsap.quickTo(cursorDot,  'y', {duration:.08, ease:'power3'});
+    ringX = gsap.quickTo(cursorRing, 'x', {duration:.45, ease:'power3'});
+    ringY = gsap.quickTo(cursorRing, 'y', {duration:.45, ease:'power3'});
+  }
+
+  var lastFragTime = 0;
+  function spawnFragment(x,y){
+    if(reduceMotion) return;
+    var now = performance.now();
+    if(now - lastFragTime < 45) return;
+    lastFragTime = now;
+    var frag = document.createElement('span');
+    frag.className = 'cursor-frag';
+    var size = gsap.utils.random(6,18);
+    var red = Math.random() < .12;
+    frag.style.width = size+'px';
+    frag.style.background = red ? 'var(--blood)' : 'var(--gray)';
+    document.body.appendChild(frag);
+    gsap.set(frag, { x:x, y:y, rotate:gsap.utils.random(0,360), opacity:.6 });
+    gsap.to(frag, { opacity:0, scale:.2, rotate:'+=90', duration:.5, ease:'power2.out', onComplete:function(){ frag.remove(); } });
+  }
+
+  window.addEventListener('mousemove', function(e){
+    var nx = e.clientX / window.innerWidth  - .5;
+    var ny = e.clientY / window.innerHeight - .5;
+    parallaxEls.forEach(function(el, i){
+      var factor = parseFloat(el.dataset.parallax) || .3;
+      qX[i](nx * 70 * factor);
+      qY[i](ny * 70 * factor);
+    });
+    if(isFinePointer){
+      dotX(e.clientX);  dotY(e.clientY);
+      ringX(e.clientX); ringY(e.clientY);
+      spawnFragment(e.clientX, e.clientY);
+    }
+  });
+
+  /* interactive hover -> cursor distortion + element glitch */
+  var hoverJitter;
+  document.querySelectorAll('.interactive').forEach(function(el){
+    el.addEventListener('mouseenter', function(){
+      if(isFinePointer){
+        gsap.to(cursorRing, { scale:1.8, borderColor:'var(--blood)', duration:.3 });
+        hoverJitter = setInterval(function(){
+          gsap.to(cursorRing, {
+            skewX:gsap.utils.random(-15,15),
+            scaleX:gsap.utils.random(.85,1.15),
+            scaleY:gsap.utils.random(.85,1.15),
+            duration:.08
+          });
+        }, 80);
+      }
+      if(el.id === 'wordmark' && !reduceMotion){
+        gsap.to(baseLayer, { x:'random(-3,3)', y:'random(-2,2)', duration:.06, repeat:-1, repeatRefresh:true, ease:'none' });
+        glitchBurst({ intensity:8, duration:.3, repeats:4 });
+      }
+    });
+    el.addEventListener('mouseleave', function(){
+      clearInterval(hoverJitter);
+      if(isFinePointer){
+        gsap.to(cursorRing, { scale:1, skewX:0, scaleX:1, scaleY:1, borderColor:'var(--bone)', duration:.25 });
+      }
+      if(el.id === 'wordmark'){
+        gsap.killTweensOf(baseLayer);
+        gsap.to(baseLayer, { x:0, y:0, duration:.2 });
+      }
+    });
+  });
+
+  /* ------------------------------------------------------------
+     SCROLL-EXIT PARALLAX (hero -> next section)
+     ------------------------------------------------------------ */
+  gsap.timeline({
+    scrollTrigger:{ trigger:'.hero', start:'top top', end:'bottom top', scrub:true }
+  })
+  .to('.threads-canvas', { yPercent:20, opacity:.15, ease:'none' }, 0)
+  .to('.ring--left',      { yPercent:-35, xPercent:-12, ease:'none' }, 0)
+  .to('.ring--right',     { yPercent:-45, xPercent:12,  ease:'none' }, 0)
+  .to('.wordmark-wrap',   { yPercent:-18, opacity:0, ease:'none' }, 0)
+  .to('.pulse',           { opacity:0, ease:'none' }, 0)
+  .to('.web-lines',       { opacity:0, ease:'none' }, 0);
+
+  gsap.fromTo('#work .mono-label',
+    { opacity:0, y:16 },
+    { opacity:1, y:0, duration:.6, scrollTrigger:{ trigger:'#work', start:'top 85%' } }
+  );
+
+})();
+</script>
+</body>
+</html>
